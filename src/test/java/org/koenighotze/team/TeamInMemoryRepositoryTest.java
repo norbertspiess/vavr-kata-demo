@@ -1,15 +1,17 @@
 package org.koenighotze.team;
 
+import io.vavr.collection.List;
+import io.vavr.control.Option;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import static java.math.BigDecimal.ONE;
 import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.math.*;
-import java.time.*;
-import java.util.*;
-
-import org.junit.*;
 
 public class TeamInMemoryRepositoryTest {
 
@@ -20,21 +22,21 @@ public class TeamInMemoryRepositoryTest {
     public void init() {
         //@formatter:off
         team = new Team("999",
-                        randomUUID().toString(),
-                        "someurl",
-                        "sometrainer",
-                        BigDecimal.valueOf(1232),
-                        LocalDate.of(1233, 5, 5));
+                randomUUID().toString(),
+                "someurl",
+                "sometrainer",
+                BigDecimal.valueOf(1232),
+                LocalDate.of(1233, 5, 5));
 
         repository = new TeamInMemoryRepository();
         repository.deleteAll();
 
         repository.save(new Team("1",
-                                 "Fortuna Düsseldorf",
-                                 "https://tmssl.akamaized.net//images/wappen/head/38.png?lm=1405514004",
-                                 "Friedhelm Funkel",
-                                 BigDecimal.valueOf(13000000),
-                                 LocalDate.of(1895, 5, 5)));
+                "Fortuna Düsseldorf",
+                "https://tmssl.akamaized.net//images/wappen/head/38.png?lm=1405514004",
+                "Friedhelm Funkel",
+                BigDecimal.valueOf(13000000),
+                LocalDate.of(1895, 5, 5)));
         //@formatter:on
     }
 
@@ -59,23 +61,24 @@ public class TeamInMemoryRepositoryTest {
     public void an_existing_team_can_be_found() {
         repository.save(team);
 
-        Team foundTeam = repository.findById(team.getId());
+        Option<Team> foundTeam = repository.findById(team.getId());
 
-        assertThat(foundTeam).isEqualTo(team);
+        assertThat(foundTeam).isNotEmpty();
+        assertThat(foundTeam.get()).isEqualTo(team);
     }
 
     @Test
     public void if_the_team_is_missing_it_cannot_be_found() {
-        Team foundTeam = repository.findById(team.getId());
+        Option<Team> foundTeam = repository.findById(team.getId());
 
-        assertThat(foundTeam).isNull();
+        assertThat(foundTeam).isEmpty();
     }
 
     @Test
     public void findAll_returns_all_teams() {
         repository.save(team);
 
-        Collection<Team> allTeams = repository.findAll();
+        List<Team> allTeams = repository.findAll();
 
         assertThat(allTeams).hasSize(2);
     }
@@ -83,8 +86,8 @@ public class TeamInMemoryRepositoryTest {
     @Test
     public void findAll_returns_empty_if_no_teams_are_found() {
         repository.deleteAll();
-        
-        Collection<Team> allTeams = repository.findAll();
+
+        List<Team> allTeams = repository.findAll();
 
         assertThat(allTeams).isEmpty();
     }

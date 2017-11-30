@@ -1,9 +1,11 @@
 package org.koenighotze.team;
 
-import java.util.*;
-import java.util.concurrent.*;
+import io.vavr.collection.List;
+import io.vavr.control.Option;
+import org.springframework.stereotype.Repository;
 
-import org.springframework.stereotype.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class TeamInMemoryRepository {
@@ -13,12 +15,12 @@ public class TeamInMemoryRepository {
         data.put(team.getId(), team);
     }
 
-    public Collection<Team> findAll() {
-        return data.values();
+    public List<Team> findAll() {
+        return List.ofAll(data.values());
     }
 
-    public Team findById(String id) {
-        return data.get(id);
+    public Option<Team> findById(String id) {
+        return Option.of(data.get(id));
     }
 
     public void deleteAll() {
